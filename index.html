@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional IMEI/UPC Scanner - iPHOXY CORP</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2196F3">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="IMEI Scanner">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="app-logo">📱</div>
+                    <div class="app-title">
+                        <h1>Professional IMEI/UPC Scanner</h1>
+                        <div class="company-name">iPHOXY CORP</div>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <button id="settingsBtn" class="icon-btn" title="Settings">⚙️</button>
+                    <button id="helpBtn" class="icon-btn" title="Help">❓</button>
+                    <div class="connection-indicator">
+                        <span id="connectionStatus" class="status-dot offline"></span>
+                        <span id="connectionText">Offline</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- User Selection Section -->
+        <section class="user-section">
+            <div class="section-header">
+                <h2>👤 User Authentication</h2>
+            </div>
+            <div class="user-controls">
+                <select id="userSelect" class="user-dropdown">
+                    <option value="">Select your name to continue...</option>
+                    <option value="Aiman">Aiman (Manager)</option>
+                    <option value="Scanner1">Scanner Operator 1</option>
+                    <option value="Scanner2">Scanner Operator 2</option>
+                    <option value="Scanner3">Scanner Operator 3</option>
+                    <option value="Scanner4">Scanner Operator 4</option>
+                    <option value="Scanner5">Scanner Operator 5</option>
+                    <option value="QualityControl">Quality Control</option>
+                    <option value="Supervisor">Supervisor</option>
+                </select>
+                <div id="userInfo" class="user-info" style="display: none;">
+                    <span class="user-avatar">👤</span>
+                    <span id="currentUser" class="user-name"></span>
+                    <span id="sessionTime" class="session-time"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Dashboard -->
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2>📊 Real-Time Statistics</h2>
+                <button id="refreshStats" class="refresh-btn">🔄</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-icon">📱</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="sessionScans">0</div>
+                        <div class="stat-label">Session Scans</div>
+                    </div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="validScans">0</div>
+                        <div class="stat-label">Valid IMEI/UPC</div>
+                    </div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-icon">🚫</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="duplicateBlocked">0</div>
+                        <div class="stat-label">Duplicates Blocked</div>
+                    </div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="errorCount">0</div>
+                        <div class="stat-label">Scan Errors</div>
+                    </div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="scanRate">0</div>
+                        <div class="stat-label">Scans/Min</div>
+                    </div>
+                </div>
+                <div class="stat-card secondary">
+                    <div class="stat-icon">☁️</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="cloudSynced">0</div>
+                        <div class="stat-label">Cloud Synced</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Camera Control Section -->
+        <section class="camera-control-section">
+            <div class="section-header">
+                <h2>📷 Camera Controls</h2>
+                <div class="scan-mode-selector">
+                    <label for="scanModeSelect">Mode:</label>
+                    <select id="scanModeSelect">
+                        <option value="ultra-fast">Ultra Fast (50ms)</option>
+                        <option value="fast">Fast (100ms)</option>
+                        <option value="normal">Normal (200ms)</option>
+                        <option value="precise">Precise (500ms)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="camera-controls">
+                <button id="startScanningBtn" class="primary-btn large">
+                    <span class="btn-icon">🚀</span>
+                    <span class="btn-text">Start Ultra-Fast Scanning</span>
+                </button>
+                <button id="stopScanningBtn" class="secondary-btn large" style="display: none;">
+                    <span class="btn-icon">⏹️</span>
+                    <span class="btn-text">Stop Scanning</span>
+                </button>
+                <div class="secondary-controls" style="display: none;">
+                    <button id="switchCameraBtn" class="control-btn">🔄 Switch Camera</button>
+                    <button id="toggleFlashBtn" class="control-btn">💡 Flash</button>
+                    <button id="focusBtn" class="control-btn">🎯 Focus</button>
+                    <button id="captureBtn" class="control-btn">📸 Capture</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Camera Feed Section -->
+        <section class="camera-section">
+            <div class="camera-container" id="cameraContainer">
+                <!-- Camera Placeholder -->
+                <div id="cameraPlaceholder" class="camera-placeholder">
+                    <div class="placeholder-content">
+                        <div class="placeholder-icon">📷</div>
+                        <div class="placeholder-title">Camera Ready</div>
+                        <div class="placeholder-subtitle">Click "Start Scanning" to begin</div>
+                        <div class="placeholder-tips">
+                            <div class="tip">💡 Position device 30-50cm above phone boxes</div>
+                            <div class="tip">🔆 Ensure good lighting conditions</div>
+                            <div class="tip">📱 Hold device steady for best results</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Camera Feed -->
+                <div id="cameraFeedContainer" class="camera-feed-container" style="display: none;">
+                    <video id="cameraVideo" autoplay playsinline muted></video>
+                    <canvas id="overlayCanvas" class="overlay-canvas"></canvas>
+                    
+                    <!-- Real-time Detection Overlay -->
+                    <div class="detection-overlay">
+                        <div class="detection-header">
+                            <div class="detection-status">
+                                <span id="detectionIndicator" class="detection-dot scanning"></span>
+                                <span id="detectionText">Scanning for barcodes...</span>
+                            </div>
+                            <div class="detection-controls">
+                                <button id="pauseDetection" class="mini-btn">⏸️</button>
+                                <button id="clearDetections" class="mini-btn">🗑️</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Live Detection Results -->
+                        <div id="liveDetections" class="live-detections">
+                            <!-- Detected barcodes will appear here -->
+                        </div>
+                    </div>
+
+                    <!-- Scanning Guidelines Overlay -->
+                    <div class="scanning-guidelines">
+                        <div class="guideline-box">
+                            <div class="guideline-text">Position phone box here</div>
+                            <div class="guideline-border"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scan Results Section -->
+        <section class="results-section">
+            <div class="section-header">
+                <h2>📋 Scan Results</h2>
+                <div class="results-controls">
+                    <button id="filterBtn" class="filter-btn">🔍 Filter</button>
+                    <button id="sortBtn" class="sort-btn">📊 Sort</button>
+                    <select id="resultsPerPage" class="results-select">
+                        <option value="10">10 per page</option>
+                        <option value="25" selected>25 per page</option>
+                        <option value="50">50 per page</option>
+                        <option value="100">100 per page</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="results-container">
+                <div id="scanResultsList" class="results-list">
+                    <div class="no-results">
+                        <div class="no-results-icon">📱</div>
+                        <div class="no-results-text">No scans yet</div>
+                        <div class="no-results-subtitle">Start scanning to see results here</div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div id="pagination" class="pagination" style="display: none;">
+                    <button id="prevPage" class="page-btn">← Previous</button>
+                    <span id="pageInfo" class="page-info">Page 1 of 1</span>
+                    <button id="nextPage" class="page-btn">Next →</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Action Buttons Section -->
+        <section class="actions-section">
+            <div class="section-header">
+                <h2>🔧 Actions</h2>
+            </div>
+            <div class="action-buttons">
+                <button id="exportExcelBtn" class="action-btn primary">
+                    <span class="btn-icon">📊</span>
+                    <span class="btn-text">Export to Excel</span>
+                    <span class="btn-count" id="exportCount">(0)</span>
+                </button>
+                <button id="syncGoogleSheetsBtn" class="action-btn success">
+                    <span class="btn-icon">☁️</span>
+                    <span class="btn-text">Sync to Google Sheets</span>
+                    <span class="btn-status" id="syncStatus">Ready</span>
+                </button>
+                <button id="backupDataBtn" class="action-btn info">
+                    <span class="btn-icon">💾</span>
+                    <span class="btn-text">Backup Data</span>
+                </button>
+                <button id="clearSessionBtn" class="action-btn warning">
+                    <span class="btn-icon">🗑️</span>
+                    <span class="btn-text">Clear Session</span>
+                </button>
+                <button id="resetAllBtn" class="action-btn danger">
+                    <span class="btn-icon">🔄</span>
+                    <span class="btn-text">Reset All Data</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div id="statusMessage" class="status-message">Ready to scan IMEI and UPC barcodes</div>
+            <div class="status-indicators">
+                <div id="cameraStatus" class="status-indicator">📷 Camera: Ready</div>
+                <div id="storageStatus" class="status-indicator">💾 Storage: OK</div>
+                <div id="networkStatus" class="status-indicator">🌐 Network: Offline</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>⚙️ Scanner Settings</h3>
+                <span class="close-btn" id="closeSettings">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="settings-tabs">
+                    <button class="tab-btn active" data-tab="general">General</button>
+                    <button class="tab-btn" data-tab="scanning">Scanning</button>
+                    <button class="tab-btn" data-tab="integration">Integration</button>
+                    <button class="tab-btn" data-tab="advanced">Advanced</button>
+                </div>
+
+                <!-- General Settings -->
+                <div id="generalTab" class="tab-content active">
+                    <div class="setting-group">
+                        <label for="companyName">Company Name:</label>
+                        <input type="text" id="companyName" value="iPHOXY CORP" readonly>
+                    </div>
+                    <div class="setting-group">
+                        <label for="sessionTimeout">Session Timeout (minutes):</label>
+                        <select id="sessionTimeout">
+                            <option value="30">30 minutes</option>
+                            <option value="60" selected>1 hour</option>
+                            <option value="120">2 hours</option>
+                            <option value="240">4 hours</option>
+                            <option value="0">No timeout</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label for="autoSave">Auto-save interval:</label>
+                        <select id="autoSave">
+                            <option value="10">Every 10 scans</option>
+                            <option value="25" selected>Every 25 scans</option>
+                            <option value="50">Every 50 scans</option>
+                            <option value="100">Every 100 scans</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Scanning Settings -->
+                <div id="scanningTab" class="tab-content">
+                    <div class="setting-group">
+                        <label for="scanSpeed">Scan Speed:</label>
+                        <select id="scanSpeed">
+                            <option value="50">Ultra Fast (50ms)</option>
+                            <option value="100" selected>Fast (100ms)</option>
+                            <option value="200">Normal (200ms)</option>
+                            <option value="500">Precise (500ms)</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label for="duplicateHandling">Duplicate Handling:</label>
+                        <select id="duplicateHandling">
+                            <option value="block" selected>Block duplicates</option>
+                            <option value="warn">Warn about duplicates</option>
+                            <option value="allow">Allow duplicates</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label for="soundEnabled">Sound Notifications:</label>
+                        <input type="checkbox" id="soundEnabled" checked>
+                    </div>
+                    <div class="setting-group">
+                        <label for="vibrationEnabled">Vibration Feedback:</label>
+                        <input type="checkbox" id="vibrationEnabled" checked>
+                    </div>
+                </div>
+
+                <!-- Integration Settings -->
+                <div id="integrationTab" class="tab-content">
+                    <div class="setting-group">
+                        <label for="googleSheetsUrl">Google Sheets API URL:</label>
+                        <input type="url" id="googleSheetsUrl" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
+                        <small>Enter your Google Apps Script web app URL</small>
+                    </div>
+                    <div class="setting-group">
+                        <label for="sheetName">Sheet Name:</label>
+                        <input type="text" id="sheetName" value="scanning manu" placeholder="Sheet name">
+                    </div>
+                    <div class="setting-group">
+                        <label for="autoSync">Auto-sync to Google Sheets:</label>
+                        <input type="checkbox" id="autoSync" checked>
+                    </div>
+                    <div class="setting-group">
+                        <label for="syncInterval">Sync Interval:</label>
+                        <select id="syncInterval">
+                            <option value="realtime" selected>Real-time</option>
+                            <option value="1">Every minute</option>
+                            <option value="5">Every 5 minutes</option>
+                            <option value="15">Every 15 minutes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Advanced Settings -->
+                <div id="advancedTab" class="tab-content">
+                    <div class="setting-group">
+                        <label for="debugMode">Debug Mode:</label>
+                        <input type="checkbox" id="debugMode">
+                    </div>
+                    <div class="setting-group">
+                        <label for="cameraResolution">Camera Resolution:</label>
+                        <select id="cameraResolution">
+                            <option value="720p" selected>720p (Recommended)</option>
+                            <option value="1080p">1080p (High Quality)</option>
+                            <option value="480p">480p (Fast Performance)</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label for="maxStorageSize">Max Local Storage (MB):</label>
+                        <select id="maxStorageSize">
+                            <option value="10">10 MB</option>
+                            <option value="50" selected>50 MB</option>
+                            <option value="100">100 MB</option>
+                            <option value="500">500 MB</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="resetSettings" class="btn secondary">Reset to Defaults</button>
+                <button id="saveSettings" class="btn primary">💾 Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>❓ Help & Instructions</h3>
+                <span class="close-btn" id="closeHelp">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="help-content">
+                    <h4>🚀 Quick Start Guide</h4>
+                    <ol>
+                        <li>Select your name from the user dropdown</li>
+                        <li>Configure Google Sheets URL in Settings</li>
+                        <li>Click "Start Ultra-Fast Scanning"</li>
+                        <li>Position device 30-50cm above phone boxes</li>
+                        <li>Watch for colored overlays on detected barcodes</li>
+                        <li>Export or sync data when finished</li>
+                    </ol>
+
+                    <h4>📱 Supported Barcode Types</h4>
+                    <div class="barcode-types">
+                        <span class="barcode-tag">IMEI (15 digits)</span>
+                        <span class="barcode-tag">MEID (14 digits)</span>
+                        <span class="barcode-tag">UPC-A (12 digits)</span>
+                        <span class="barcode-tag">UPC-E (8 digits)</span>
+                        <span class="barcode-tag">EAN-13</span>
+                        <span class="barcode-tag">EAN-8</span>
+                        <span class="barcode-tag">Code 128</span>
+                        <span class="barcode-tag">Code 39</span>
+                    </div>
+
+                    <h4>💡 Tips for Best Results</h4>
+                    <ul>
+                        <li>Ensure good lighting conditions</li>
+                        <li>Hold device steady during scanning</li>
+                        <li>Keep barcodes flat and unobstructed</li>
+                        <li>Clean camera lens regularly</li>
+                        <li>Use landscape orientation for better coverage</li>
+                    </ul>
+
+                    <h4>🔧 Troubleshooting</h4>
+                    <ul>
+                        <li><strong>Camera not working:</strong> Check permissions and refresh page</li>
+                        <li><strong>Barcodes not detected:</strong> Improve lighting and distance</li>
+                        <li><strong>Duplicates appearing:</strong> Enable duplicate blocking in settings</li>
+                        <li><strong>Sync issues:</strong> Verify Google Sheets URL and internet connection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="successSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
+    </audio>
+    <audio id="errorSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
+    </audio>
+
+    <!-- Load ZXing library -->
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
